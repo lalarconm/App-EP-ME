@@ -389,6 +389,7 @@ def resultado_rmac(tiempo): # Si el input (tiempo) es "Td" (i.e. tarea es diaria
 
 # Algoritmo para calcular RMac y RMic de acuerdo al árbol de decisión de la circular SUSESO
 if labor=='Macrolabor':
+    df['rmic__tareas_severas'], df['rmic__tareas_moderadas'], df['rmic__tareas_leves']='No aplica', 'No aplica', 'No aplica' 
     if (sum(listado_tareas_con_riesgo_td)==0) & (sum(listado_tareas_con_riesgo_tm)==0): # Si no se registran tareas con riesgo (codificación es 0 para cada tarea), entonces no se ejecuta fórmula de RMac
         'No hay tareas con riesgo'
         df['rmac__tareas_severas'], df['calif__tareas_severas']='No aplica', 'No aplica'
@@ -515,7 +516,7 @@ else: # El loop de la Microlabor es equivalente al de Macrolabor, solo que más 
             'No hay más tareas a evaluar'
 
 # Desplejar dataframe
-# df.to_excel('registro_datos_EPME.xlsx') #Original
+# df.to_excel('registro_datos_EPME.xlsx') # Original (solo una vez)
 
 # Botón de click para guardar calificación de la herramienta
 guardar=st.button('Click para guardar registro')
