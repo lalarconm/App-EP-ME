@@ -8,6 +8,7 @@ from shareplum import Office365
 from shareplum import Site
 from shareplum.site import Version
 from io import StringIO
+import pytz
 image = Image.open('logo mutual.jpg') # Guardar imagen del logo mutual en la misma carpeta de la App
 
 # Código para abrir app en la ventana de comandos de Anaconda
@@ -524,8 +525,9 @@ guardar=st.button('Click para guardar registro')
 if guardar==True: # Si se da click al botón, entonces se guardaran los datos en una planilla excel
 
     # Obtener fecha y hora en que se guarda el registro
-    fecha_hora=datetime.now()
+    fecha_hora= datetime.now(pytz.timezone('Chile/Continental'))
     fecha_hora = fecha_hora.strftime("%d/%m/%Y %H:%M:%S")
+
     df.insert(1,'rut_paciente',rut_paciente)
     df.insert(2,'rut_empresa',rut_empresa) 
     df.insert(3,'fecha_informe',fecha_informe.strftime("%d/%m/%Y"))
