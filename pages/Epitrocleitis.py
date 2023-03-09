@@ -15,7 +15,7 @@ image = Image.open('logo mutual.jpg') # Guardar imagen del logo mutual en la mis
 # $ cd C:\Users\lalarcon\OneDrive - Mutual\Escritorio\Luis\Proyectos Data Science\EP-ME\App (cambiar por directorio personal)
 # $ streamlit run Epicondilitis.py
 
-diagnostico='Tendinopatia del Manguito Rotador' # Modificar diagnóstico
+diagnostico='epitrocleitis' # Modificar diagnóstico
 
 # Titulo
 st.title('Calificador Automático de EP-ME')
@@ -74,46 +74,43 @@ for i in range(n_tareas): # Se activa for/loop por cada tarea
             tiempo_tarea_mensual='No aplica'
     else:
         variabilidad_tarea='Si' # Formula diferenciadora de tareas diarias y no diarias solo aplica para Macrolabores. Para simplicidad del código, se asumió que la Microlabor solo tiene tareas diarias
-        tiempo_tarea_semanal = st.number_input('¿Cuánto es el **tiempo diario** -en minutos- de de trabajo con exposición a riesgo (Td) dedicado a la tarea '+str(i+1)+'?',
+        tiempo_tarea_semanal = st.number_input('¿Cuánto es el **tiempo diario** -en minutos- de trabajo con exposición a riesgo (Td) dedicado a la tarea '+str(i+1)+'?',
             min_value=0.0,  step=10.0)
         Td.append(tiempo_tarea_semanal)
 
         tiempo_tarea_mensual='No aplica'
 
-    # 4.2 Abducción del hombro
+    # 4.2 Flexión de muñeca
     st.markdown("### Pregunta 1")
-    abd_hombro = st.slider(
-        '¿Cuál es el rango de amplitud -en grados- de **abducción** de hombro al realizar la tarea '+str(i+1)+'?',
-        0, 100, (0, 59))
-    'Abducción máxima:', abd_hombro[1] # Mostrar máxima abducción de hombro. Éste será el valor tomado para calcular el riesgo
+    flx_muneca = st.slider(
+        '¿Cuál es el rango de amplitud -en grados- de la **flexión de muñeca** al realizar la tarea '+str(i+1)+'?',
+        0, 100, (0, 14))
+    'Flexión máxima:', flx_muneca[1] # Mostrar máxima flexión de muñeca. Éste será el valor tomado para calcular el riesgo
 
-    if abd_hombro[1]<60:
-        resultado=resultado+0 # Si la abducción es menor a 60°, el puntaje será 0
-    elif (abd_hombro[1]>=60) & (abd_hombro[1]<=89):
-        resultado=resultado+1 # Si la abducción esta en el intervalo [60°,89°], el puntaje será 1
-    elif abd_hombro[1]>=90:
-        resultado=resultado+2 # Si abducción es mayor o igual a 90°, el puntaje será 2
+    if flx_muneca[1]<15:
+        resultado=resultado+0 # Si la flexión es menor a 15°, el puntaje será 0
+    elif (flx_muneca[1]>=15) & (flx_muneca[1]<30):
+        resultado=resultado+1 # Si la flexión esta en el intervalo [15°,30°[, el puntaje será 1
+    elif flx_muneca[1]>=30:
+        resultado=resultado+2 # Si flexión es mayor o igual a 30°, el puntaje será 2
 
-    # 4.3 Rotación interna/externa
+    # 4.3 Pronación
     st.markdown("### Pregunta 2")
-    rotacion = st.selectbox(
-        '¿Se observa **rotación interna y/o externa** del hombro al realizar la tarea '+str(i+1)+'?',
-        ['Ausente', 'Presente'])
+    pronacion = st.selectbox(
+        '¿En qué rango se observa la postura en **pronación** durante la tarea '+str(i+1)+'?',
+        ['Ausente', 'Rango Intermedio', 'Rango Extremo'])
 
-    if rotacion=='Ausente':
-        resultado=resultado+0 # Si la rotación no esta presente, el puntaje será 0
-    elif (rotacion=='Presente') & (abd_hombro[1]==0):
-        resultado=resultado+0
-        mensaje='Se observa rotación, pero sin abducción de hombro. Por lo tanto, el puntaje será 0:'
-        txt='<p style="font-family:Courier; color: Red; font-size: 12px">'+mensaje+'</p>'
-        st.markdown(txt, unsafe_allow_html=True)
-    elif (rotacion=='Presente') & (abd_hombro[1]>0): # Debe ir acompañada de abducción de hombro, independiente de su amplitud
-        resultado=resultado+1 # Si la rotación esta presente y existe abducción, el puntaje será 1
+    if pronacion=='Ausente':
+        resultado=resultado+0 # Si la pronación esta ausente, el puntaje será 0
+    elif pronacion=='Rango Intermedio':
+        resultado=resultado+1 # Si la pronación esta en rango intermedio, el puntaje será 1
+    elif pronacion=='Rango Extremo':
+        resultado=resultado+2 # Si la pronación esta en rango extremo, el puntaje será 2
 
     # 4.4 Postura mantenida
     st.markdown("### Pregunta 3")
     postura = st.selectbox(
-        '¿Se observa **postura mantenida** mayor a 4 segundos -en abducción y/o rotación interna de hombro- al realizar la tarea '+str(i+1)+'?',
+        '¿Se observa una **postura mantenida** por más de 4 segundos en la tarea '+str(i+1)+'?',
         ['Ausente', 'Presente'])
 
     if postura=='Ausente':
@@ -121,37 +118,36 @@ for i in range(n_tareas): # Se activa for/loop por cada tarea
     elif postura=='Presente':
         resultado=resultado+1 # Si la postura se mantiene más de 4 segundos, el puntaje será 1
 
-    # 4.4 Repetitividad
+    # 4.5 Repetitividad
     st.markdown("### Pregunta 4")
     if labor=="Microlabor": # Esta pregunta solo aplica para una Microlabor
-        repetitividad_mic = st.number_input(
+        repetitividad = st.number_input(
         '¿Cuánto es el número **más alto** de repeticiones (Mov/Min) realizadas por el trabajador en la tarea '+str(i+1)+'?',
         min_value=0,  step=1)
 
-        if repetitividad_mic<1:
-            resultado=resultado+0 # Si la repetitividad de movimientos por minúto es menor a 1, el puntaje será 0
-        elif (repetitividad_mic>=1) & (repetitividad_mic<3):
-            resultado=resultado+1 # Si la repetitividad de movimientos por minúto se encuentra en el intervalo [1,3[, el puntaje será 1
-        elif (repetitividad_mic>=3) & (repetitividad_mic<5):
-            resultado=resultado+2 # Si la repetitividad de movimientos por minúto se encuentra en el intervalo [3,5[, el puntaje será 1
-        elif repetitividad_mic>=5:
-            resultado=resultado+3 # Si la repetitividad de movimientos por minúto es mayor o igual a 5, el puntaje será 2
+        if repetitividad<5:
+            resultado=resultado+0 # Si la repetitividad de movimientos por minúto es menor a 5, el puntaje será 0
+        elif (repetitividad>=5) & (repetitividad<10):
+            resultado=resultado+1 # Si la repetitividad de movimientos por minúto se encuentra en el intervalo [5,10[, el puntaje será 1
+        elif repetitividad>10:
+            resultado=resultado+2 # Si la repetitividad de movimientos por minúto es mayor a 10, el puntaje será 2
 
-        repetitividad_mac='No aplica' # Este item no aplica para macrolabor
-
+        latko='No aplica' # Esta columna no aplica para microlabor
     else:
-        repetitividad_mac = st.selectbox(
-            '¿Se observa repetitividad en la tarea '+str(i+1)+'?',
-            ['Ausente', 'Presente'])
+        latko = st.slider(
+        '¿Cuánta es la **más alta** repetitividad (Latko) realizada por el trabajador en la tarea '+str(i+1)+'?',
+        0, 10, step=2) # Esta pregunta solo aplica para una Macrolabor
 
-        if repetitividad_mac=='Ausente':
-            resultado=resultado+0 # Si no se observa repetitividad, el puntaje será 0
-        elif repetitividad_mac=='Presente':
-            resultado=resultado+1 # Si se observa repetitividad,, el puntaje será 1
+        if latko<=2:
+            resultado=resultado+0 # Si el Latko es menor o igual a 2, el puntaje será 0
+        elif (latko>2) & (latko<=4):
+            resultado=resultado+1 # Si el Latko se encuentra en el intervalo ]2,4], el puntaje será 1
+        elif latko>4:
+            resultado=resultado+2 # Si el Latko es mayor a 4, el puntaje será 2
 
-        repetitividad_mic='No aplica' # Este item no aplica para microlabor
+        repetitividad='No aplica' # Esta columna no aplica para macrolabor
 
-    # 4.5 Fuerza (borg)
+    # 4.6 Fuerza (borg)
     st.markdown("### Pregunta 5")
     borg = st.slider(
     '¿Cuál es la **más alta** percepción de fuerza (Borg) realizada por el trabajador en la tarea '+str(i+1)+'?',
@@ -174,8 +170,8 @@ for i in range(n_tareas): # Se activa for/loop por cada tarea
             listado_tareas_con_riesgo_td.append(0) # Código 0: Sin riesgo o Insuficiente
         elif variabilidad_tarea=='No': # Por su parte, los resultados de las tareas no diarias se almacenan en la lista de tareas no diarias
             listado_tareas_con_riesgo_tm.append(0)
-    elif ((resultado>=1) & (resultado<=2)): 
-        nivel_riesgo='Insuficiente por puntaje'
+    elif ((resultado>=1) & (resultado<=2)) | (flx_muneca[1]<15): # Si la flexión es <15°, la tarea tendrá riesgo insuficiente, independientemente del puntaje obtenido
+        nivel_riesgo='Insuficiente por puntaje o porque la flexión de muñeca es < 15°'
         color='Grey'
         if (variabilidad_tarea=='Si'):
             listado_tareas_con_riesgo_td.append(0) # Código 0: Sin riesgo o Insuficiente
@@ -215,21 +211,21 @@ for i in range(n_tareas): # Se activa for/loop por cada tarea
             'tiempo_tarea_mensual':tiempo_tarea_mensual,
             'tiempo_tarea_semanal':tiempo_tarea_semanal,
             'extension_muneca':'No aplica',
-            'flexion_muneca':'No aplica',
+            'flexion_muneca':flx_muneca[1],
             'flexion_hombro':'No aplica',
             'golpe_mano':'No aplica',
             'pinzamiento':'No aplica',
-            'abduccion_hombro':abd_hombro[1],
-            'rotacion':rotacion,
+            'abduccion_hombro':'No aplica',
+            'rotacion':'No aplica',
             'supinacion':'No aplica',
-            'pronacion':'No aplica',
+            'pronacion':pronacion,
             'postura':postura,
-            'repetitividad_mic':repetitividad_mic,
-            'repetitividad_mac':repetitividad_mac,
-            'latko':'No aplica',
+            'repetitividad_mic':repetitividad,
+            'repetitividad_mac':'No aplica',
+            'latko':latko,
             'borg':borg,
             'puntaje':resultado,
-            'riesgo':nivel_riesgo} 
+            'riesgo':nivel_riesgo}
 
     tabla.append(pd.DataFrame(data, index=[0])) 
     '---'
@@ -444,7 +440,7 @@ if labor=='Macrolabor':
         
         st.markdown('## Tareas no diarias') # Despues el RMac de las tareas no diarias
         resultado_rmac('Tm')
-        
+   
 else: # El loop de la Microlabor es equivalente al de Macrolabor, solo que más sencillo pues no requiere diferenciar por tareas diarias y no diarias
     df['rmac__tareas_severas'], df['rmac__tareas_moderadas'], df['rmac__tareas_leves']='No aplica', 'No aplica', 'No aplica' 
     codigo_riesgo_tarea = 3
@@ -601,8 +597,5 @@ with c1:
     ''
     ''
     st.image(image, width=400,caption='Subgerencia de Innovación e Investigación')
-
-
-
 
 

@@ -15,7 +15,7 @@ image = Image.open('logo mutual.jpg') # Guardar imagen del logo mutual en la mis
 # $ cd C:\Users\lalarcon\OneDrive - Mutual\Escritorio\Luis\Proyectos Data Science\EP-ME\App (cambiar por directorio personal)
 # $ streamlit run Epicondilitis.py
 
-diagnostico='Tendinopatia del Manguito Rotador' # Modificar diagnóstico
+diagnostico='Bursitis Subacromial de Hombro' # Modificar diagnóstico
 
 # Titulo
 st.title('Calificador Automático de EP-ME')
@@ -444,7 +444,7 @@ if labor=='Macrolabor':
         
         st.markdown('## Tareas no diarias') # Despues el RMac de las tareas no diarias
         resultado_rmac('Tm')
-        
+     
 else: # El loop de la Microlabor es equivalente al de Macrolabor, solo que más sencillo pues no requiere diferenciar por tareas diarias y no diarias
     df['rmac__tareas_severas'], df['rmac__tareas_moderadas'], df['rmac__tareas_leves']='No aplica', 'No aplica', 'No aplica' 
     codigo_riesgo_tarea = 3
@@ -601,8 +601,5 @@ with c1:
     ''
     ''
     st.image(image, width=400,caption='Subgerencia de Innovación e Investigación')
-
-
-
 
 
