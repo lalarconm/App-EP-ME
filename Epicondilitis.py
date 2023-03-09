@@ -34,7 +34,7 @@ labor = st.sidebar.selectbox(
 fecha_informe = st.date_input('Fecha Informe', date.today())
 if labor=='Macrolabor': # Solo aplica para Macrolabor
     tiempo_total = st.number_input(
-        '¿Cuánto es el tiempo total -en minutos- de la jornada de trabajo (TTJ)?',
+        '¿Cuánto es el **tiempo total** -en minutos- de la jornada de trabajo (TTJ)?',
         min_value=0,  step=10)
 else:
     tiempo_total='No aplica'
@@ -43,7 +43,6 @@ else:
 n_tareas = st.sidebar.radio(
     '¿Cuántas tareas realiza el trabajador?',
     (1, 2, 3, 4, 5)) # Se definió un máximo de 5 tareas, pero podrían llegar a ser más
-
 
 # 3.2 Datos paciente -> Para futuros cruces con otras bases de datos
 rut_paciente = st.sidebar.text_input('Rut del trabajador (Sin puntos y con guión)','12345678-9')
@@ -59,23 +58,23 @@ for i in range(n_tareas): # Se activa for/loop por cada tarea
     
     # 4.1 Tiempo de trabajo diario (Td) o mensual (Tm) con exposición a riesgo
     if labor=='Macrolabor':
-        variabilidad_tarea= st.selectbox('¿La tarea '+str(i+1)+' es realizada todos los días de la semana?',
+        variabilidad_tarea= st.selectbox('¿La tarea '+str(i+1)+' es realizada **todos los días de la semana**?',
             ['Si', 'No'])
         if variabilidad_tarea=='No':
-            tiempo_tarea_mensual= st.number_input('¿Cúanto es el tiempo mensual (Tm) -en minutos- dedicado a la tarea '+str(i+1)+'?',
+            tiempo_tarea_mensual= st.number_input('¿Cúanto es el **tiempo mensual** -en minutos- de trabajo con exposición a riesgo (Tm) dedicado a la tarea '+str(i+1)+'?',
             min_value=0.0,  step=10.0, max_value=float(10800))
             Tm.append(tiempo_tarea_mensual)
 
             tiempo_tarea_semanal='No aplica'
         else:
-            tiempo_tarea_semanal = st.number_input('¿Cuánto es el tiempo diario (Td) -en minutos- dedicado a la tarea '+str(i+1)+'?',
+            tiempo_tarea_semanal = st.number_input('¿Cuánto es el **tiempo diario** -en minutos- de trabajo con exposición a riesgo (Td) dedicado a la tarea '+str(i+1)+'?',
             min_value=0.0,  step=10.0, max_value=float(tiempo_total))
             Td.append(tiempo_tarea_semanal)
 
             tiempo_tarea_mensual='No aplica'
     else:
         variabilidad_tarea='Si' # Formula diferenciadora de tareas diarias y no diarias solo aplica para Macrolabores. Para simplicidad del código, se asumió que la Microlabor solo tiene tareas diarias
-        tiempo_tarea_semanal = st.number_input('¿Cuánto es el tiempo diario (Td) -en minutos- dedicado a la tarea '+str(i+1)+'?',
+        tiempo_tarea_semanal = st.number_input('¿Cuánto es el **tiempo diario** -en minutos- de trabajo con exposición a riesgo (Td) dedicado a la tarea '+str(i+1)+'?',
             min_value=0.0,  step=10.0)
         Td.append(tiempo_tarea_semanal)
 
@@ -84,7 +83,7 @@ for i in range(n_tareas): # Se activa for/loop por cada tarea
     # 4.2 Extensión de muñecas
     st.markdown("### Pregunta 1")
     ext_muneca = st.slider(
-        '¿Cuál es el rango de amplitud (en grados) en la extesión de muñeca en la tarea '+str(i+1)+'?',
+        '¿Cuál es el rango de amplitud -en grados- en la **extensión de muñeca** en la tarea '+str(i+1)+'?',
         0, 100, (0, 25))
     'Extensión máxima:', ext_muneca[1] # Mostrar máxima extensión del codo. Éste será el valor tomado para calcular el riesgo
 
@@ -98,7 +97,7 @@ for i in range(n_tareas): # Se activa for/loop por cada tarea
     # 4.3 Supinación
     st.markdown("### Pregunta 2")
     supinacion = st.selectbox(
-        '¿Cuál es el rango de supinación de la tarea '+str(i+1)+'?',
+        '¿Cuál es el rango de **supinación** de la tarea '+str(i+1)+'?',
         ['Ausente', 'Rango Intermedio', 'Rango Extremo'])
 
     if supinacion=='Ausente':
@@ -111,7 +110,7 @@ for i in range(n_tareas): # Se activa for/loop por cada tarea
     # 4.4 Postura mantenida
     st.markdown("### Pregunta 3")
     postura = st.selectbox(
-        '¿Se observa una postura mantenida por más de 4 segundos en la tarea '+str(i+1)+'?',
+        '¿Se observa una **postura mantenida** por más de 4 segundos en la tarea '+str(i+1)+'?',
         ['Ausente', 'Presente'])
 
     if postura=='Ausente':
@@ -212,9 +211,17 @@ for i in range(n_tareas): # Se activa for/loop por cada tarea
             'tiempo_tarea_mensual':tiempo_tarea_mensual,
             'tiempo_tarea_semanal':tiempo_tarea_semanal,
             'extension_muneca':ext_muneca[1],
+            'flexion_muneca':'No aplica',
+            'flexion_hombro':'No aplica',
+            'golpe_mano':'No aplica',
+            'pinzamiento':'No aplica',
+            'abduccion_hombro':'No aplica',
+            'rotacion':'No aplica',
             'supinacion':supinacion,
+            'pronacion':'No aplica',
             'postura':postura,
-            'repetitividad':repetitividad,
+            'repetitividad_mic':repetitividad,
+            'repetitividad_mac':'No aplica',
             'latko':latko,
             'borg':borg,
             'puntaje':resultado,
@@ -346,8 +353,12 @@ def resultado_rmac(tiempo): # Si el input (tiempo) es "Td" (i.e. tarea es diaria
                             'No hay más tareas a evaluar'
                 else:
                     'No hay más tareas a evaluar'
+                    df['rmac__tareas_leves'], df['calif__tareas_leves']='No aplica', 'No aplica'
         else:
             'No hay más tareas a evaluar'
+            df['rmac__tareas_moderadas'], df['calif__tareas_moderadas']='No aplica', 'No aplica' 
+            df['rmac__tareas_leves'], df['calif__tareas_leves']='No aplica', 'No aplica'
+
     else: # Si no se detectan tareas con riesgo severo, se partirán buscando tareas con riesgo moderado y se repetirá el algoritmo de la sección anterior
         df['rmac__tareas_severas'], df['calif__tareas_severas']='No aplica', 'No aplica'
         codigo_riesgo_tarea = 2 
@@ -369,6 +380,7 @@ def resultado_rmac(tiempo): # Si el input (tiempo) es "Td" (i.e. tarea es diaria
                     df['rmac__tareas_leves'], df['calif__tareas_leves']='No aplica', 'No aplica'
                     'No hay más tareas a evaluar'
             else:
+                df['rmac__tareas_leves'], df['calif__tareas_leves']='No aplica', 'No aplica'
                 'No hay más tareas a evaluar'
         else:
             df['rmac__tareas_moderadas'], df['calif__tareas_moderadas']='No aplica', 'No aplica' 
@@ -428,7 +440,6 @@ if labor=='Macrolabor':
         
         st.markdown('## Tareas no diarias') # Despues el RMac de las tareas no diarias
         resultado_rmac('Tm')
-
         
 else: # El loop de la Microlabor es equivalente al de Macrolabor, solo que más sencillo pues no requiere diferenciar por tareas diarias y no diarias
     df['rmac__tareas_severas'], df['rmac__tareas_moderadas'], df['rmac__tareas_leves']='No aplica', 'No aplica', 'No aplica' 
@@ -528,6 +539,7 @@ if guardar==True: # Si se da click al botón, entonces se guardaran los datos en
     fecha_hora= datetime.now(pytz.timezone('Chile/Continental'))
     fecha_hora = fecha_hora.strftime("%d/%m/%Y %H:%M:%S")
 
+    # Agregar campos de información del paciente, empresa, fecha del registro y el diagnóstico evaluado
     df.insert(1,'rut_paciente',rut_paciente)
     df.insert(2,'rut_empresa',rut_empresa) 
     df.insert(3,'fecha_informe',fecha_informe.strftime("%d/%m/%Y"))
@@ -552,6 +564,7 @@ if guardar==True: # Si se da click al botón, entonces se guardaran los datos en
     #     updated_data.to_excel(writer, sheet_name='Sheet1', index=False)
 
     # --------------Guardar en Sharepoint-------------------
+    # Este código permite acceder a la carpeta en sharepoint y el archivo dónde se almacenan los registros de calificación
     server_url = "https://mutualcl.sharepoint.com/"
     site_url = server_url + "sites/SubgerenciaInnovacineInvestigacin"
     Username = 'estudiosyanalisis@mutual.cl'
@@ -564,18 +577,21 @@ if guardar==True: # Si se da click al botón, entonces se guardaran los datos en
     folder = site.Folder(Sharepoint_folder)
     data=StringIO(str(folder.get_file(nombre_archivo),'utf-8'))
     df_original=pd.read_csv(data,sep=';')
-
+ 
+    # Se pegan los últimos registros al archivo original
     new_data = df.assign()
     df_final = df_original.append(new_data)
-
     df_final.to_csv(nombre_archivo,sep=';',index=False)
 
+    # Se carga la información en sharepoint
     with open(nombre_archivo, mode='rb') as file:
         fileContent = file.read()
     folder.upload_file(fileContent, nombre_archivo)
     file.close()
 
-    'Registro cargado'
+    mensaje='Registro guardado!'
+    txt='<p style="font-family:Courier; color: Red; font-size: 15px">'+mensaje+'</p>'
+    st.markdown(txt, unsafe_allow_html=True)
 
 # Desplegar logo Mutual al final de la pagina
 c1,c2,c3=st.columns(3)
