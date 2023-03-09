@@ -276,9 +276,9 @@ def calculo_rmac(posicion,rango_minimo,rango_intermedio,tiempo):
         rmac=round((sum(T)/ttjm)*100,1) # Si la tarea no es diaria se aplica la fórmula (Tm/TTjm)*100
     
     'El RMac es: ', rmac,'%, por lo que el caso califica como: '
-    if rmac<rango_minimo: # Acá se define intervalo para decidir si enfermedad es de origen común o profesional. Este intervalo va a cambiar dependiendo del tipo de riesgo. Es por ello que se piden los intervalos en el input de la función
-        color='Green' # Se despliega texto color verde para enfermedades de origen común
-        resultado='Enfermedad Común'
+    if rmac<rango_minimo: # Acá se define intervalo para decidir si enfermedad es de origen comun o profesional. Este intervalo va a cambiar dependiendo del tipo de riesgo. Es por ello que se piden los intervalos en el input de la función
+        color='Green' # Se despliega texto color verde para enfermedades de origen comun
+        resultado='Enfermedad comun'
         texto='<p style="font-family:Courier; color:'+color+'; font-size: 20px">'+resultado+'</p>' # Editar fuente de texto
         return st.markdown(texto, unsafe_allow_html=True),resultado,rmac # Desplegar texto
     elif (rmac>=rango_minimo) & (rmac<rango_intermedio): # Rango para situación límite
@@ -300,7 +300,7 @@ def calculo_rmic(posicion,rango_minimo,rango_intermedio): # Esta fórmula es sim
     'El RMic es: ', rmic,'horas, por lo que el caso califica como: '
     if rmic<rango_minimo:
         color='Green'
-        resultado='Enfermedad Común'
+        resultado='Enfermedad comun'
         texto='<p style="font-family:Courier; color:'+color+'; font-size: 20px">'+resultado+'</p>'
         return st.markdown(texto, unsafe_allow_html=True),resultado,rmic
     elif (rmic>=rango_minimo) & (rmic<rango_intermedio):
@@ -323,7 +323,7 @@ def resultado_rmac(tiempo): # Si el input (tiempo) es "Td" (i.e. tarea es diaria
         st.markdown('### Cálculo del RMac para tareas con riesgo severo') # Desplegar texto
         res,calificacion,rmac=calculo_rmac(posicion,25,30,tiempo) # Se activa función para calcular RMac Severo
         df['rmac__tareas_severas'], df['calif__tareas_severas']= rmac, calificacion 
-        if calificacion=='Enfermedad Común': # Si califica como enfermedad común, entonces se procede a calcular RMac de tareas con riesgo moderado y asi sucesivamnte
+        if calificacion=='Enfermedad comun': # Si califica como enfermedad comun, entonces se procede a calcular RMac de tareas con riesgo moderado y asi sucesivamnte
             codigo_riesgo_tarea = 2 # Codificación 2: Riesgo Moderado
             posicion=find_indices(codigo_riesgo_tarea,tiempo) # Se buscan tareas con riesgo moderado
             if len(posicion)==0: # Si no se detectan tareas con riesgo moderado, se procede a identificar tareas con riesgo leve
@@ -337,13 +337,13 @@ def resultado_rmac(tiempo): # Si el input (tiempo) es "Td" (i.e. tarea es diaria
                     st.markdown('### Cálculo del RMac para tareas con riesgo leve') # Desplegar texto
                     res,calificacion,rmac=calculo_rmac(posicion,65,70,tiempo) # Se activa función para calcular RMac Leve
                     df['rmac__tareas_leves'], df['calif__tareas_leves']= rmac, calificacion
-                    if calificacion=='Enfermedad Común': # Si todos los RMac califican como enfermedad común, entonces se acaba el proceso
+                    if calificacion=='Enfermedad comun': # Si todos los RMac califican como enfermedad comun, entonces se acaba el proceso
                         'No hay más tareas a evaluar'
             elif len(posicion)>0: # Si se detectan tareas con riesgo moderado, entonces se cálcula RMac para dichas tareas
                 st.markdown('### Cálculo del RMac para tareas con riesgo moderado') # Desplegar texto
                 res,calificacion,rmac=calculo_rmac(posicion,45,50,tiempo) # Se activa función para calcular RMac Moderado
                 df['rmac__tareas_moderadas'], df['calif__tareas_moderadas']= rmac, calificacion
-                if calificacion=='Enfermedad Común': # Si califica como enfermedad común, entonces se procede a calcular RMac de tareas con riesgo leve
+                if calificacion=='Enfermedad comun': # Si califica como enfermedad comun, entonces se procede a calcular RMac de tareas con riesgo leve
                     codigo_riesgo_tarea = 1 # Codificación 1: Riesgo Leve
                     posicion=find_indices(codigo_riesgo_tarea,tiempo) # Se buscan tareas con riesgo leve
                     if len(posicion)==0: # Si no hay tareas de riesgo leve, entonces no hay más tareas a evaluar y se acaba el proceso
@@ -353,7 +353,7 @@ def resultado_rmac(tiempo): # Si el input (tiempo) es "Td" (i.e. tarea es diaria
                         st.markdown('### Cálculo del RMac para tareas con riesgo leve') # Desplegar texto
                         res,calificacion,rmac=calculo_rmac(posicion,65,70,tiempo)
                         df['rmac__tareas_leves'], df['calif__tareas_leves']= rmac, calificacion
-                        if calificacion=='Enfermedad Común': # Si no hay tareas de riesgo leve, entonces no hay más tareas a evaluar y se acaba el proceso
+                        if calificacion=='Enfermedad comun': # Si no hay tareas de riesgo leve, entonces no hay más tareas a evaluar y se acaba el proceso
                             'No hay más tareas a evaluar'
                 else:
                     'No hay más tareas a evaluar'
@@ -371,14 +371,14 @@ def resultado_rmac(tiempo): # Si el input (tiempo) es "Td" (i.e. tarea es diaria
             st.markdown('### Cálculo del RMac para tareas con riesgo moderado')
             res,calificacion,rmac=calculo_rmac(posicion,45,50,tiempo)
             df['rmac__tareas_moderadas'], df['calif__tareas_moderadas']= rmac, calificacion
-            if calificacion=='Enfermedad Común':
+            if calificacion=='Enfermedad comun':
                 codigo_riesgo_tarea = 1
                 posicion=find_indices(codigo_riesgo_tarea,tiempo)
                 if len(posicion)>0:
                     st.markdown('### Cálculo del RMac para tareas con riesgo leve')
                     res,calificacion,rmac=calculo_rmac(posicion,65,70,tiempo)
                     df['rmac__tareas_leves'], df['calif__tareas_leves']= rmac, calificacion
-                    if calificacion=='Enfermedad Común':
+                    if calificacion=='Enfermedad comun':
                         'No hay más tareas a evaluar'
                 else:
                     df['rmac__tareas_leves'], df['calif__tareas_leves']='No aplica', 'No aplica'
@@ -394,7 +394,7 @@ def resultado_rmac(tiempo): # Si el input (tiempo) es "Td" (i.e. tarea es diaria
                 st.markdown('### Cálculo del RMac para tareas con riesgo leve')
                 res,calificacion,rmac=calculo_rmac(posicion,65,70,tiempo)
                 df['rmac__tareas_leves'], df['calif__tareas_leves']= rmac, calificacion
-                if calificacion=='Enfermedad Común':
+                if calificacion=='Enfermedad comun':
                     'No hay más tareas a evaluar'
                 else:
                     'No hay más tareas a evaluar'
@@ -464,14 +464,14 @@ else: # El loop de la Microlabor es equivalente al de Macrolabor, solo que más 
                 st.markdown('### Cálculo del RMic para tareas con riesgo leve')
                 res,calificacion,rmic=calculo_rmic(posicion,3.5,4) # Rango minimo: 3.5 ; Rango intermedio: 4
                 df['rmic__tareas_leves'], df['calif__tareas_leves']= rmic, calificacion
-                if calificacion=='Enfermedad Común':
+                if calificacion=='Enfermedad comun':
                     'No hay más tareas a evaluar' 
                 
         elif len(posicion)>0:
             st.markdown('### Cálculo del RMic para tareas con riesgo moderado')
             res,calificacion,rmic=calculo_rmic(posicion,2.5,3) # Rango minimo: 2.5 ; Rango intermedio: 3
             df['rmic__tareas_moderadas'], df['calif__tareas_moderadas']= rmic, calificacion
-            if calificacion=='Enfermedad Común':
+            if calificacion=='Enfermedad comun':
                 codigo_riesgo_tarea = 1
                 posicion=find_indices(codigo_riesgo_tarea,'Td')
                 if len(posicion)==0:
@@ -481,7 +481,7 @@ else: # El loop de la Microlabor es equivalente al de Macrolabor, solo que más 
                     st.markdown('### Cálculo del RMic para tareas con riesgo leve')
                     res,calificacion,rmic=calculo_rmic(posicion,3.5,4)
                     df['rmic__tareas_leves'], df['calif__tareas_leves']= rmic, calificacion 
-                    if calificacion=='Enfermedad Común':
+                    if calificacion=='Enfermedad comun':
                         'No hay más tareas a evaluar'
             else:
                 df['rmic__tareas_leves'], df['calif__tareas_leves']='No aplica', 'No aplica'
@@ -491,7 +491,7 @@ else: # El loop de la Microlabor es equivalente al de Macrolabor, solo que más 
         st.markdown('### Cálculo del RMic para tareas con riesgo severo')
         res,calificacion,rmic=calculo_rmic(posicion,1.5,2) # Rango minimo: 1.5 ; Rango intermedio: 2
         df['rmic__tareas_severas'], df['calif__tareas_severas']= rmic, calificacion 
-        if calificacion=='Enfermedad Común':
+        if calificacion=='Enfermedad comun':
             codigo_riesgo_tarea = 2
             posicion=find_indices(codigo_riesgo_tarea,'Td')
             if len(posicion)==0:
@@ -505,13 +505,13 @@ else: # El loop de la Microlabor es equivalente al de Macrolabor, solo que más 
                     st.markdown('### Cálculo del RMic para tareas con riesgo leve')
                     res,calificacion,rmic=calculo_rmic(posicion,3.5,4)
                     df['rmic__tareas_leves'], df['calif__tareas_leves']= rmic, calificacion 
-                    if calificacion=='Enfermedad Común':
+                    if calificacion=='Enfermedad comun':
                         'No hay más tareas a evaluar'
             elif len(posicion)>0:
                 st.markdown('### Cálculo del RMic para tareas con riesgo moderado')
                 res,calificacion,rmic=calculo_rmic(posicion,2.5,3)
                 df['rmic__tareas_moderadas'], df['calif__tareas_moderadas']= rmic, calificacion
-                if calificacion=='Enfermedad Común':
+                if calificacion=='Enfermedad comun':
                     codigo_riesgo_tarea = 1
                     posicion=find_indices(codigo_riesgo_tarea,'Td')
                     if len(posicion)==0:
@@ -521,7 +521,7 @@ else: # El loop de la Microlabor es equivalente al de Macrolabor, solo que más 
                         st.markdown('### Cálculo del RMic para tareas con riesgo leve')
                         res,calificacion,rmic=calculo_rmic(posicion,3.5,4)
                         df['rmic__tareas_leves'], df['calif__tareas_leves']= rmic, calificacion  
-                        if calificacion=='Enfermedad Común':
+                        if calificacion=='Enfermedad comun':
                             'No hay más tareas a evaluar'
                 else:
                     df['rmic__tareas_leves'], df['calif__tareas_leves']='No aplica', 'No aplica'
